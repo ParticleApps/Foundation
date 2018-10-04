@@ -10,6 +10,7 @@
 		841A21572164A72D00BA3A65 /* ParticleFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 841A21552164A72D00BA3A65 /* ParticleFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841A215F2164A77900BA3A65 /* BaseAppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841A215E2164A77900BA3A65 /* BaseAppCoordinator.swift */; };
 		841A21652165B14700BA3A65 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841A21642165B14700BA3A65 /* CacheManager.swift */; };
+		841A2167216654FC00BA3A65 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841A2166216654FB00BA3A65 /* ConfigurationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		841A21562164A72D00BA3A65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		841A215E2164A77900BA3A65 /* BaseAppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAppCoordinator.swift; sourceTree = "<group>"; };
 		841A21642165B14700BA3A65 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
+		841A2166216654FB00BA3A65 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 			children = (
 				841A215E2164A77900BA3A65 /* BaseAppCoordinator.swift */,
 				841A21642165B14700BA3A65 /* CacheManager.swift */,
+				841A2166216654FB00BA3A65 /* ConfigurationManager.swift */,
 				841A215D2164A74200BA3A65 /* Supporting Files */,
 			);
 			path = ParticleFoundation;
@@ -147,6 +150,7 @@
 			files = (
 				841A21652165B14700BA3A65 /* CacheManager.swift in Sources */,
 				841A215F2164A77900BA3A65 /* BaseAppCoordinator.swift in Sources */,
+				841A2167216654FC00BA3A65 /* ConfigurationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
