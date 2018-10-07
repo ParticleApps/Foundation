@@ -44,11 +44,26 @@ class CacheManager {
         return filename
     }
     
-    public func getCachedResponse(url: URL, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+    public func getCachedDictionaryResponse(url: URL, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
         let filename = self.fileURL(url: url, baseURL: Bundle.main.resourceURL!)
         do {
             let data = try Data(contentsOf: filename, options: .mappedIfSafe)
             if let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves) as? Dictionary<String, Any> {
+                success(jsonResult)
+            }
+            else {
+                failure(nil)
+            }
+        } catch {
+            failure(error)
+        }
+    }
+    
+    public func getCachedArrayResponse(url: URL, success: @escaping (Array<Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+        let filename = self.fileURL(url: url, baseURL: Bundle.main.resourceURL!)
+        do {
+            let data = try Data(contentsOf: filename, options: .mappedIfSafe)
+            if let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves) as? Array<Any> {
                 success(jsonResult)
             }
             else {
