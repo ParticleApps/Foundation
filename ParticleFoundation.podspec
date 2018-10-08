@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name                  = 'ParticleFoundation'
-  spec.version               = '0.1.0'
+  spec.version               = '0.9.0'
   spec.summary               = 'Particle\'s Swift Foundation.'
   spec.description           = 'Adds bases for commonly used objects in.'
   spec.homepage              = 'https://github.com/ParticleApps/Foundation'
@@ -11,4 +11,5 @@ Pod::Spec.new do |spec|
   spec.frameworks            = 'Foundation', 'UIKit'
   spec.ios.deployment_target = '10.0'
   spec.source_files          = "ParticleFoundation", "ParticleFoundation/**/*.{swift,h,m}"
+  spec.swift_version         = '3.3'
 end

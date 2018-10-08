@@ -70,7 +70,6 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
         let topViewController = self.presentingViewController()
         if let presentedNavigationController = topViewController as? UINavigationController {
             if presentedNavigationController.viewControllers.count > 1 {
-                //TODO: Test why we need this
                 presentedNavigationController.popViewController(animated: true)
             }
             else {

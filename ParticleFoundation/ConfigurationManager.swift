@@ -14,6 +14,11 @@ class ConfigurationManager {
     private(set) var loadFromCache: Bool = false
     private(set) var saveToCache: Bool = false
     
+    public enum Keys: String {
+        case loadFromCache = "loadFromCache"
+        case saveToCache = "saveToCache"
+    }
+    
     init() {
         guard
             let path = Bundle.main.path(forResource: "Configuration", ofType: "plist"),
@@ -25,7 +30,7 @@ class ConfigurationManager {
         }
         
         self.payload = configuration
-        self.loadFromCache = configuration["loadFromCache"] as? Bool ?? false
-        self.saveToCache = configuration["saveToCache"] as? Bool ?? false
+        self.loadFromCache = configuration[ConfigurationManager.Keys.loadFromCache.rawValue] as? Bool ?? false
+        self.saveToCache = configuration[ConfigurationManager.Keys.saveToCache.rawValue] as? Bool ?? false
     }
 }
