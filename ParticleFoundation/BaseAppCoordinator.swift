@@ -80,7 +80,7 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             topViewController.dismiss(animated: true, completion: nil)
         }
     }
-    public func transition(viewController: UIViewController, options: UIViewAnimationOptions) {
+    public func transition(viewController: UIViewController, options: UIView.AnimationOptions) {
         //HACK: Some weird stuff happens if you transition viewControllers while a custom presented view controller exists
         self.window.rootViewController?.dismiss(animated: true, completion: nil)
         UIView.transition(with: self.window, duration: 0.5, options: options, animations: {
@@ -166,12 +166,12 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             break
         case .googleMaps:
             if let url = googleMapsURL {
-                UIApplication.shared.open(url, options: [String: Any](), completionHandler: nil)
+                UIApplication.shared.open(url, options: [UIApplication.OpenExternalURLOptionsKey: Any](), completionHandler: nil)
             }
             break
         case .waze:
             if let url = wazeURL {
-                UIApplication.shared.open(url, options: [String: Any](), completionHandler: nil)
+                UIApplication.shared.open(url, options: [UIApplication.OpenExternalURLOptionsKey: Any](), completionHandler: nil)
             }
             break
         }
