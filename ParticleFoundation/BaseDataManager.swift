@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class BaseDataManager {
+open class BaseDataManager {
     open var persistentContainer: NSPersistentContainer = {
         let containerName = Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
         let container = NSPersistentContainer(name: containerName)
@@ -22,7 +22,14 @@ class BaseDataManager {
         })
         return container
     }()
-    private func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+    
+    //MARK: Initializers
+    public init() {
+        //Do nothing
+    }
+    
+    //MARK: Network Requests
+    open func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
                 CacheManager.sharedInstance.getCachedDictionaryResponse(url: url, success: success, failure: failure)
@@ -52,7 +59,7 @@ class BaseDataManager {
             task.resume()
         }
     }
-    private func makeRequestForJSONArray(request: URLRequest, success: @escaping (Array<Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+    open func makeRequestForJSONArray(request: URLRequest, success: @escaping (Array<Any>) -> Void, failure: @escaping (Error?) -> Void?) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
                 CacheManager.sharedInstance.getCachedArrayResponse(url: url, success: success, failure: failure)
@@ -82,10 +89,14 @@ class BaseDataManager {
             task.resume()
         }
     }
+    
+    //MARK: Helpers
     open func requestForURL(url: URL) -> NSMutableURLRequest {
         let request = NSMutableURLRequest(url: url, cachePolicy: NSURLRequest.CachePolicy.reloadIgnoringCacheData, timeoutInterval: 200)
         return request
     }
+    
+    //MARK: Core Data
     open func deleteManagedObject(object: NSManagedObject, success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
         self.persistentContainer.viewContext.delete(object)
         self.saveCurrentContext(success: success, failure: failure)
