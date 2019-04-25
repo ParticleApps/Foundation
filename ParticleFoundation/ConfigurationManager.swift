@@ -23,9 +23,8 @@ class ConfigurationManager {
         guard
             let path = Bundle.main.path(forResource: "Configuration", ofType: "plist"),
             let configuration = NSDictionary(contentsOfFile: path) as? Dictionary<String, Any> else {
-                print("Exiting due to a broken configuration file!")
+                print("ConfigurationManager: Missing configuration file.")
                 self.payload = Dictionary<String, Any>()
-                assert(false)
                 return
         }
         
