@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CacheManager {
+open class CacheManager {
     static let sharedInstance = CacheManager()
     
     private func getDocumentsDirectory() -> URL {

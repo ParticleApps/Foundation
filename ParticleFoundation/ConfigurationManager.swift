@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ConfigurationManager {
+open class ConfigurationManager {
     static let sharedInstance = ConfigurationManager()
     public let payload: Dictionary<String, Any>
     private(set) var loadFromCache: Bool = false
@@ -19,7 +19,7 @@ class ConfigurationManager {
         case saveToCache = "saveToCache"
     }
     
-    init() {
+    public init() {
         guard
             let path = Bundle.main.path(forResource: "Configuration", ofType: "plist"),
             let configuration = NSDictionary(contentsOfFile: path) as? Dictionary<String, Any> else {
