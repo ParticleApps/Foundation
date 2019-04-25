@@ -9,7 +9,7 @@
 import Foundation
 import CoreLocation
 
-class LocationManager: NSObject, CLLocationManagerDelegate {
+open class LocationManager: NSObject, CLLocationManagerDelegate {
     static let locationDidChangeNotification = NSNotification.Name(rawValue: "locationsDidChange")
     static let sharedInstance = LocationManager()
     private let manager: CLLocationManager = {
@@ -38,7 +38,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     //MARK: Actions
-    func startUpdatingLocation() {
+    public func startUpdatingLocation() {
         if self.isAvailable {
             manager.startUpdatingLocation()
         }
@@ -46,16 +46,16 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
             manager.requestWhenInUseAuthorization()
         }
     }
-    func stopUpdatingLocation() {
+    public func stopUpdatingLocation() {
         manager.stopUpdatingLocation()
     }
     
     //MARK: CLLocationManagerDelegate
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations.sorted { $0.horizontalAccuracy < $1.horizontalAccuracy }.first
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             self.startUpdatingLocation()
         }
