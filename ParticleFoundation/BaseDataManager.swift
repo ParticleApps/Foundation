@@ -29,6 +29,25 @@ open class BaseDataManager {
     }
     
     //MARK: Network Requests
+    public func makeRequestForString(request: URLRequest, success: @escaping (String) -> Void, failure: @escaping (Error?) -> Void?) {
+        let task = URLSession(configuration: URLSessionConfiguration.default).dataTask(with: request) { (data, response, error) in
+            if let responseData = data {
+                if ConfigurationManager.sharedInstance.saveToCache {
+                    CacheManager.sharedInstance.cacheResponse(response: data!, url: request.url!)
+                }
+                if let response = String(data: responseData, encoding: String.Encoding.utf8) {
+                    success(response)
+                }
+                else {
+                    failure(error)
+                }
+            }
+            else {
+                failure(error)
+            }
+        }
+        task.resume()
+    }
     open func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
