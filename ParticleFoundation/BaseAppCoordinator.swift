@@ -65,6 +65,9 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
                 subNavigationController.transitioningDelegate  = navigationControllerDelegate
                 subNavigationController.modalPresentationStyle = UIModalPresentationStyle.custom
             }
+            else if #available(iOS 13.0, *) {
+                viewController.modalPresentationStyle = .fullScreen
+            }
             
             self.presentedViewController().present(subNavigationController, animated: animated, completion: nil)
             self.presentationStack.append(subNavigationController)
@@ -73,6 +76,9 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             if custom {
                 viewController.transitioningDelegate  = navigationControllerDelegate
                 viewController.modalPresentationStyle = UIModalPresentationStyle.custom
+            }
+            else if #available(iOS 13.0, *) {
+                viewController.modalPresentationStyle = .fullScreen
             }
             
             self.presentedViewController().present(viewController, animated: animated, completion: nil)
