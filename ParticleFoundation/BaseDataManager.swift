@@ -48,7 +48,7 @@ open class BaseDataManager {
         }
         task.resume()
     }
-    open func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+    open func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
                 CacheManager.sharedInstance.getCachedDictionaryResponse(url: url, success: success, failure: failure)
