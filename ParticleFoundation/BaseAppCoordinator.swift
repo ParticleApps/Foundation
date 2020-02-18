@@ -85,9 +85,13 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             self.presentationStack.append(viewController)
         }
     }
-    open func presentAlert(title: String?, subtitle: String?, handler: ((UIAlertAction) -> Swift.Void)? = nil) {
+    open func presentAlert(title: String?, subtitle: String?, actions: [UIAlertAction]? = nil, handler: ((UIAlertAction) -> Swift.Void)? = nil) {
         let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: handler))
+        
+        actions?.forEach({ (action) in
+            alert.addAction(action)
+        })
         
         self.presentedViewController().present(alert, animated: true, completion: nil)
     }
