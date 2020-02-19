@@ -18,7 +18,7 @@ public enum MapOption: String {
 }
 public typealias CoordinatorNavigationDelegate = NSObject & UINavigationControllerDelegate & UIViewControllerTransitioningDelegate
 
-open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
+open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate, UIAdaptivePresentationControllerDelegate {
     open var navigationController = UINavigationController() //I dont like that this is not publically facing to other classes
     open private(set) var navigationControllerDelegate: CoordinatorNavigationDelegate? = nil
     private var presentationStack: [UIViewController] = [UIViewController]()
@@ -60,26 +60,32 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
         if withNavigationController {
             let subNavigationController = UINavigationController(rootViewController: viewController)
             
+            //Watch for iOS 13 presentation dismissals
+            if #available(iOS 13.0, *) {
+                subNavigationController.presentationController?.delegate = self
+            }
+            
+            //Add custom Parameters
             if custom {
                 subNavigationController.delegate               = navigationControllerDelegate
                 subNavigationController.transitioningDelegate  = navigationControllerDelegate
                 subNavigationController.modalPresentationStyle = UIModalPresentationStyle.custom
             }
-//            else if #available(iOS 13.0, *) {
-//                viewController.modalPresentationStyle = .fullScreen
-//            }
             
             self.presentedViewController().present(subNavigationController, animated: animated, completion: nil)
             self.presentationStack.append(subNavigationController)
         }
         else {
+            //Watch for iOS 13 presentation dismissals
+            if #available(iOS 13.0, *) {
+                viewController.presentationController?.delegate = self
+            }
+            
+            //Add Custom Parameters
             if custom {
                 viewController.transitioningDelegate  = navigationControllerDelegate
                 viewController.modalPresentationStyle = UIModalPresentationStyle.custom
             }
-//            else if #available(iOS 13.0, *) {
-//                viewController.modalPresentationStyle = .fullScreen
-//            }
             
             self.presentedViewController().present(viewController, animated: animated, completion: nil)
             self.presentationStack.append(viewController)
@@ -210,6 +216,11 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             }
             break
         }
+    }
+    
+    //MARK: UIAdaptivePresentationControllerDelegate
+    public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        self.presentationStack.removeLast()
     }
     
     //MARK: MFMailComposeViewControllerDelegate
