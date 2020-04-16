@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 open class BaseDataManager {
-    open var persistentContainer: NSPersistentContainer = {
+    open var persistentContainer: NSPersistentContainer {
         let containerName = Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
         let container = NSPersistentContainer(name: containerName)
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -21,9 +21,9 @@ open class BaseDataManager {
             }
         })
         return container
-    }()
+    }
     
-    var context: NSManagedObjectContext {
+    public var context: NSManagedObjectContext {
         return self.persistentContainer.viewContext
     }
     
@@ -33,26 +33,30 @@ open class BaseDataManager {
     }
     
     //MARK: Network Requests
-    public func makeRequestForString(request: URLRequest, success: @escaping (String) -> Void, failure: @escaping (Error?) -> Void?) {
+    public func makeRequestForString(request: URLRequest,
+                                     success: ((String) -> Void)? = nil,
+                                     failure: ((Error?) -> Void)? = nil) {
         let task = URLSession(configuration: URLSessionConfiguration.default).dataTask(with: request) { (data, response, error) in
             if let responseData = data {
                 if ConfigurationManager.sharedInstance.saveToCache {
                     CacheManager.sharedInstance.cacheResponse(response: data!, url: request.url!)
                 }
                 if let response = String(data: responseData, encoding: String.Encoding.utf8) {
-                    success(response)
+                    success?(response)
                 }
                 else {
-                    failure(error)
+                    failure?(error)
                 }
             }
             else {
-                failure(error)
+                failure?(error)
             }
         }
         task.resume()
     }
-    open func makeRequestForJSONDictionary(request: URLRequest, success: @escaping (Dictionary<String, Any>) -> Void, failure: @escaping (Error?) -> Void) {
+    open func makeRequestForJSONDictionary(request: URLRequest,
+                                           success: ((Dictionary<String, Any>) -> Void)? = nil,
+                                           failure: ((Error?) -> Void)? = nil) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
                 CacheManager.sharedInstance.getCachedDictionaryResponse(url: url, success: success, failure: failure)
@@ -66,23 +70,25 @@ open class BaseDataManager {
                             CacheManager.sharedInstance.cacheResponse(response: data!, url: request.url!)
                         }
                         if let json  = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableLeaves) as? Dictionary<String, Any> {
-                            success(json)
+                            success?(json)
                         }
                         else {
-                            failure(error)
+                            failure?(error)
                         }
                     } catch let error as NSError {
-                        failure(error)
+                        failure?(error)
                     }
                 }
                 else {
-                    failure(error)
+                    failure?(error)
                 }
             }
             task.resume()
         }
     }
-    open func makeRequestForJSONArray(request: URLRequest, success: @escaping (Array<Any>) -> Void, failure: @escaping (Error?) -> Void?) {
+    open func makeRequestForJSONArray(request: URLRequest,
+                                      success: ((Array<Any>) -> Void)? = nil,
+                                      failure: ((Error?) -> Void)? = nil) {
         if ConfigurationManager.sharedInstance.loadFromCache {
             if let url = request.url {
                 CacheManager.sharedInstance.getCachedArrayResponse(url: url, success: success, failure: failure)
@@ -96,17 +102,17 @@ open class BaseDataManager {
                             CacheManager.sharedInstance.cacheResponse(response: data!, url: request.url!)
                         }
                         if let json  = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableLeaves) as? Array<Any> {
-                            success(json)
+                            success?(json)
                         }
                         else {
-                            failure(error)
+                            failure?(error)
                         }
                     } catch let error as NSError {
-                        failure(error)
+                        failure?(error)
                     }
                 }
                 else {
-                    failure(error)
+                    failure?(error)
                 }
             }
             task.resume()
@@ -122,26 +128,24 @@ open class BaseDataManager {
     //MARK: Core Data
     open func fetchObjectsFromCoreData(managedClass: NSManagedObject.Type,
                                        success: (([NSManagedObject]) -> Void)?,
-                                       failure: ((Error?) -> Void)?) {
+                                       failure: ((Error?) -> Void)? = nil) {
         DispatchQueue.main.async {
             do {
                 if let objects = try self.context.fetch(managedClass.fetchRequest()) as? [NSManagedObject] {
-                    if let closure = success {
-                        closure(objects)
-                    }
+                    success?(objects)
                 }
-                else if let closure = failure {
-                    closure(nil)
+                else {
+                    failure?(nil)
                 }
             } catch {
-                if let closure = failure {
-                    closure(error)
-                }
+                failure?(error)
             }
         }
     }
     
-    open func deleteManagedObjects(_ objects: [NSManagedObject], success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
+    open func deleteManagedObjects(_ objects: [NSManagedObject],
+                                   success: (() -> Void)? = nil,
+                                   failure: ((Error?) -> Void)? = nil) {
         DispatchQueue.main.async {
             objects.forEach { (object) in
                 self.context.delete(object)
@@ -151,13 +155,14 @@ open class BaseDataManager {
         }
     }
     
-    open func saveCurrentContext(success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
+    open func saveCurrentContext(success: (() -> Void)? = nil,
+                                 failure: ((Error?) -> Void)? = nil) {
         DispatchQueue.main.async {
             do {
                 try self.context.save()
-                success()
+                success?()
             } catch {
-                failure(error)
+                failure?(error)
             }
         }
     }
