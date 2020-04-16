@@ -16,11 +16,11 @@ public enum MapOption: String {
     case googleMaps = "GoogleMaps"
     case waze       = "Waze"
 }
-public typealias CoordinatorNavigationDelegate = NSObject & UINavigationControllerDelegate & UIViewControllerTransitioningDelegate
+public typealias AppCoordinatorNavigationDelegate = NSObject & UINavigationControllerDelegate & UIViewControllerTransitioningDelegate
 
 open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate, UIAdaptivePresentationControllerDelegate {
-    open var navigationController = UINavigationController() //I dont like that this is not publically facing to other classes
-    open private(set) var navigationControllerDelegate: CoordinatorNavigationDelegate? = nil
+    open var navigationController: UINavigationController = UINavigationController()
+    open private(set) var navigationControllerDelegate: AppCoordinatorNavigationDelegate? = nil
     private var presentationStack: [UIViewController] = [UIViewController]()
     open var window: UIWindow {
         didSet {

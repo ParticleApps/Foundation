@@ -23,6 +23,10 @@ open class BaseDataManager {
         return container
     }()
     
+    var context: NSManagedObjectContext {
+        return self.persistentContainer.viewContext
+    }
+    
     //MARK: Initializers
     public init() {
         //Do nothing
@@ -116,15 +120,45 @@ open class BaseDataManager {
     }
     
     //MARK: Core Data
-    open func deleteManagedObject(object: NSManagedObject, success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
-        self.persistentContainer.viewContext.delete(object)
-        self.saveCurrentContext(success: success, failure: failure)
+    open func fetchObjectsFromCoreData(managedClass: NSManagedObject.Type,
+                                       success: (([NSManagedObject]) -> Void)?,
+                                       failure: ((Error?) -> Void)?) {
+        DispatchQueue.main.async {
+            do {
+                if let objects = try self.context.fetch(managedClass.fetchRequest()) as? [NSManagedObject] {
+                    if let closure = success {
+                        closure(objects)
+                    }
+                }
+                else if let closure = failure {
+                    closure(nil)
+                }
+            } catch {
+                if let closure = failure {
+                    closure(error)
+                }
+            }
+        }
     }
+    
+    open func deleteManagedObjects(_ objects: [NSManagedObject], success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
+        DispatchQueue.main.async {
+            objects.forEach { (object) in
+                self.context.delete(object)
+            }
+            
+            self.saveCurrentContext(success: success, failure: failure)
+        }
+    }
+    
     open func saveCurrentContext(success: @escaping () -> Void, failure: @escaping (Error?) -> Void?) {
-        do {
-            try self.persistentContainer.viewContext.save()
-        } catch {
-            failure(error)
+        DispatchQueue.main.async {
+            do {
+                try self.context.save()
+                success()
+            } catch {
+                failure(error)
+            }
         }
     }
 }
