@@ -12,15 +12,16 @@ import Foundation
 import SafariServices
 
 public enum MapOption: String {
-    case appleMaps = "AppleMaps"
+    case appleMaps  = "AppleMaps"
     case googleMaps = "GoogleMaps"
-    case waze = "Waze"
+    case waze       = "Waze"
 }
 public typealias CoordinatorNavigationDelegate = NSObject & UINavigationControllerDelegate & UIViewControllerTransitioningDelegate
 
-open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
+open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate, UIAdaptivePresentationControllerDelegate {
     open var navigationController = UINavigationController() //I dont like that this is not publically facing to other classes
     open private(set) var navigationControllerDelegate: CoordinatorNavigationDelegate? = nil
+    private var presentationStack: [UIViewController] = [UIViewController]()
     open var window: UIWindow {
         didSet {
             self.navigationController.delegate = navigationControllerDelegate
@@ -35,50 +36,88 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
     }
     
     //MARK: Accessors
-    @objc open func presentingViewController() -> UIViewController {
+    @objc open func presentedViewController() -> UIViewController {
+        if let presentedViewController = self.presentationStack.last {
+            return presentedViewController
+        }
         return self.navigationController
+    }
+    @objc open func topViewController() -> UIViewController {
+        if let presentedNavigationViewController = self.presentedViewController() as? UINavigationController {
+            return presentedNavigationViewController.topViewController ?? presentedNavigationViewController
+        }
+        return self.presentedViewController()
     }
     
     //MARK: Actions
-    open func present(viewController: UIViewController, animated: Bool = true, custom: Bool = false,
-                      withNavigationController: Bool = false, completion: (() -> Swift.Void)? = nil) {
-        //HACK: Clean this up
-        if withNavigationController {
-            let subNavigationController = UINavigationController(rootViewController: viewController)
-            if custom {
-                subNavigationController.delegate = navigationControllerDelegate
-                subNavigationController.transitioningDelegate = navigationControllerDelegate
-                subNavigationController.modalPresentationStyle = UIModalPresentationStyle.custom
-            }
-            self.presentingViewController().present(viewController, animated: animated, completion: nil)
-        }
-        else if custom {
-            viewController.transitioningDelegate = navigationControllerDelegate
-            viewController.modalPresentationStyle = UIModalPresentationStyle.custom
-        }
-        if !withNavigationController {
-            self.presentingViewController().present(viewController, animated: animated, completion: nil)
+    public func pushViewController(viewController: UIViewController, animated: Bool = true) {
+        if let subnavigationController = self.presentedViewController() as? UINavigationController {
+            subnavigationController.pushViewController(viewController, animated: animated)
         }
     }
-    open func presentAlert(title: String?, subtitle: String?, handler: ((UIAlertAction) -> Swift.Void)? = nil) {
+    open func present(viewController: UIViewController, animated: Bool = true, custom: Bool = false,
+                      withNavigationController: Bool = false, completion: (() -> Swift.Void)? = nil) {
+        if withNavigationController {
+            let subNavigationController = UINavigationController(rootViewController: viewController)
+            
+            //Watch for iOS 13 presentation dismissals
+            if #available(iOS 13.0, *) {
+                subNavigationController.presentationController?.delegate = self
+            }
+            
+            //Add custom Parameters
+            if custom {
+                subNavigationController.delegate               = navigationControllerDelegate
+                subNavigationController.transitioningDelegate  = navigationControllerDelegate
+                subNavigationController.modalPresentationStyle = UIModalPresentationStyle.custom
+            }
+            
+            self.presentedViewController().present(subNavigationController, animated: animated, completion: nil)
+            self.presentationStack.append(subNavigationController)
+        }
+        else {
+            //Watch for iOS 13 presentation dismissals
+            if #available(iOS 13.0, *) {
+                viewController.presentationController?.delegate = self
+            }
+            
+            //Add Custom Parameters
+            if custom {
+                viewController.transitioningDelegate  = navigationControllerDelegate
+                viewController.modalPresentationStyle = UIModalPresentationStyle.custom
+            }
+            
+            self.presentedViewController().present(viewController, animated: animated, completion: nil)
+            self.presentationStack.append(viewController)
+        }
+    }
+    open func presentAlert(title: String?, subtitle: String?, actions: [UIAlertAction]? = nil, handler: ((UIAlertAction) -> Swift.Void)? = nil) {
         let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: handler))
         
-        self.presentingViewController().present(alert, animated: true, completion: nil)
+        actions?.forEach({ (action) in
+            alert.addAction(action)
+        })
+        
+        self.presentedViewController().present(alert, animated: true, completion: nil)
     }
     @objc open func navigateBack() {
-        let topViewController = self.presentingViewController()
-        if let presentedNavigationController = topViewController as? UINavigationController {
-            if presentedNavigationController.viewControllers.count > 1 {
-                presentedNavigationController.popViewController(animated: true)
-            }
-            else {
-                presentedNavigationController.dismiss(animated: true, completion: nil)
-            }
+        if let subnavigationController = self.presentedViewController() as? UINavigationController, subnavigationController.viewControllers.count > 1 {
+            subnavigationController.popViewController(animated: true)
         }
         else {
-            topViewController.dismiss(animated: true, completion: nil)
+            self.dismissTopViewController()
         }
+    }
+    @objc open func dismissTopViewController() {
+        if self.presentationStack.count > 0 {
+            self.presentationStack.last?.dismiss(animated: true, completion: nil)
+            self.presentationStack.removeLast()
+        }
+    }
+    @objc open func popToRootViewController() {
+        self.navigationController.popToRootViewController(animated: true)
+        self.presentationStack.removeAll()
     }
     public func transition(viewController: UIViewController, options: UIView.AnimationOptions) {
         //HACK: Some weird stuff happens if you transition viewControllers while a custom presented view controller exists
@@ -88,11 +127,13 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
         }) { (success) in
             self.window.makeKeyAndVisible()
         }
+        
+        self.presentationStack.removeAll()
     }
     
     //MARK: Navigators
     @objc open func navigateToWebsite(url: URL) {
-        self.present(viewController: SFSafariViewController(url: url), custom: true)
+        self.presentedViewController().present(SFSafariViewController(url: url), animated: true, completion: nil)
     }
     @objc public func navigateToDirections(coordinate: CLLocationCoordinate2D, title: String? = nil) {
         let alertViewController = UIAlertController(title: "Directions", message: nil, preferredStyle: .actionSheet)
@@ -139,7 +180,7 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
                 alertViewController.addAction(action)
             }
             
-            self.present(viewController: alertViewController)
+            self.presentedViewController().present(alertViewController, animated: true, completion: nil)
         }
         else if let option = availableOptions.first {
             self.navigateToMapOption(option: option, coordinate: coordinate, title: title)
@@ -175,6 +216,11 @@ open class BaseAppCoordinator: NSObject, MFMailComposeViewControllerDelegate {
             }
             break
         }
+    }
+    
+    //MARK: UIAdaptivePresentationControllerDelegate
+    public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        self.presentationStack.removeLast()
     }
     
     //MARK: MFMailComposeViewControllerDelegate
