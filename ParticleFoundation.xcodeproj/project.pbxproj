@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840C09F42449400400324BDA /* DefaultPageViewConntroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840C09F32449400400324BDA /* DefaultPageViewConntroller.swift */; };
 		841A21572164A72D00BA3A65 /* ParticleFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 841A21552164A72D00BA3A65 /* ParticleFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841A215F2164A77900BA3A65 /* BaseAppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841A215E2164A77900BA3A65 /* BaseAppCoordinator.swift */; };
 		841A21652165B14700BA3A65 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841A21642165B14700BA3A65 /* CacheManager.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		840C09F32449400400324BDA /* DefaultPageViewConntroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultPageViewConntroller.swift; sourceTree = "<group>"; };
 		841A21522164A72D00BA3A65 /* ParticleFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ParticleFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		841A21552164A72D00BA3A65 /* ParticleFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParticleFoundation.h; sourceTree = "<group>"; };
 		841A21562164A72D00BA3A65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				841A21642165B14700BA3A65 /* CacheManager.swift */,
 				841A2166216654FB00BA3A65 /* ConfigurationManager.swift */,
 				842DCDA6216AC9160044BC68 /* ImagesPageView.swift */,
+				840C09F32449400400324BDA /* DefaultPageViewConntroller.swift */,
 				841A215D2164A74200BA3A65 /* Supporting Files */,
 			);
 			path = ParticleFoundation;
@@ -163,6 +166,7 @@
 				842DCDA5216AC8620044BC68 /* LocationManager.swift in Sources */,
 				841A2167216654FC00BA3A65 /* ConfigurationManager.swift in Sources */,
 				841A21692166568900BA3A65 /* BaseDataManager.swift in Sources */,
+				840C09F42449400400324BDA /* DefaultPageViewConntroller.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
